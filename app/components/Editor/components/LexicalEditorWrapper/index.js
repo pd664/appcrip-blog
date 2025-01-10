@@ -65,7 +65,7 @@ export default function LexicalEditorWrapper() {
   const handleCloseNotification = () => {
     setNotification(prev => ({ ...prev, open: false }));
   };
-// console.log("editor", editorState)
+console.log("editor", editorState)
   // Enhanced editor state change handler
   const handleEditorStateChange = (editorState) => {
     try {
