@@ -9,9 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@lexical/html": "^0.23.1",
+    "@lexical/react": "^0.23.1",
+    "@lexical/rich-text": "^0.23.1",
+    "@lexical/utils": "^0.23.1",
+    "@mui/icons-material": "^6.3.1",
+    "@supabase/supabase-js": "^2.47.12",
+    "@webiny/lexical-converter": "^5.41.4",
+    "i": "^0.3.7",
+    "lexical": "^0.23.1",
+    "mdi-material-ui": "^7.9.3",
+    "next": "15.1.4",
+    "npm": "^11.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.1.4"
+    "react-icons": "^5.4.0"
   },
   "devDependencies": {
     "postcss": "^8",
