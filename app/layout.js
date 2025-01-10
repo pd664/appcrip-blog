@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { handleWebVitals } from "./reportWebVitals";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,6 +18,11 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+  if (typeof window !== 'undefined') {
+    import('web-vitals').then(({ reportWebVitals }) => {
+      reportWebVitals(handleWebVitals); // Pass your custom handler
+    });
+  }
   return (
     <html lang="en">
       <body

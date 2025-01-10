@@ -43,6 +43,7 @@ export default function LexicalEditorWrapper() {
     severity: 'info' 
   });
   const[title, setTitle] = useState("")
+  const [previewImage, setPreviewImage] = useState(null);
 
   // Initialize editor if there's existing data
   useEffect(() => {
@@ -133,6 +134,11 @@ export default function LexicalEditorWrapper() {
       console.log("fileee ", file)
       if (file.type.startsWith('image/')) {
         setSelectedFile(file);
+        const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result); // Store the image data URL
+      };
+      reader.readAsDataURL(file);
       } else {
         showNotification('Please select an image file', 'error');
       }
@@ -192,7 +198,16 @@ export default function LexicalEditorWrapper() {
         <FloatingTextFormatToolbarPlugin />
         <MyOnChangePlugin onChange={handleEditorStateChange}/>
       </Box>
-      {selectedFile}
+      {previewImage && (
+    <Box sx={{ width: '200px', height: '200px', overflow: 'hidden', borderRadius: '8px' }}>
+      <img
+        src={previewImage}
+        alt="Image Preview"
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
+    </Box>
+  )}
+
       <Box sx={{ p: 2, display: 'flex', gap: 2 }}>
         <input
           type="file"
@@ -206,6 +221,7 @@ export default function LexicalEditorWrapper() {
             Upload Image
           </Button>
         </label>
+
         <Button 
           onClick={handleSave} 
           variant="contained" 
