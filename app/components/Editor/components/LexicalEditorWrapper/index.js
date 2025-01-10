@@ -192,6 +192,7 @@ export default function LexicalEditorWrapper() {
         <FloatingTextFormatToolbarPlugin />
         <MyOnChangePlugin onChange={handleEditorStateChange}/>
       </Box>
+      {selectedFile}
       <Box sx={{ p: 2, display: 'flex', gap: 2 }}>
         <input
           type="file"
