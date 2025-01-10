@@ -18,6 +18,7 @@
     "@mui/icons-material": "^6.3.1",
     "@supabase/supabase-js": "^2.47.12",
     "@webiny/lexical-converter": "^5.41.4",
+    "axios": "^1.7.9",
     "i": "^0.3.7",
     "lexical": "^0.23.1",
     "mdi-material-ui": "^7.9.3",

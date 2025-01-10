@@ -171,8 +171,8 @@ const useOnClickListener = () => {
     } else if (eventType === eventTypes.paragraph) {
       formatParagraph();
     } else if (eventType === eventTypes.h1) {
-      editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "h1");
-      // formatLargeHeading();
+      // editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "h1");
+      formatLargeHeading();
     } else if (eventType === eventTypes.h2) {
       formatSmallHeading();
     } else if (eventType === eventTypes.ul) {

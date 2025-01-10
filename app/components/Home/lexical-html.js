@@ -8,48 +8,58 @@ import { useSupabase } from "../Editor/hooks/useSupabase";
 
 // Function to recursively create Lexical nodes from lexicalData
 const createLexicalNodesFromData = (nodeData) => {
-    switch (nodeData.type) {
-      case "text":
-        const textNode = $createTextNode(nodeData.text);
-        if (nodeData.format) textNode.setFormat(nodeData.format);
-        if (nodeData.style) textNode.setStyle(nodeData.style);
-        return textNode;
-  
-      case "paragraph":
-        const paragraphNode = $createParagraphNode();
-        if (nodeData.children) {
-          nodeData.children.forEach((child) => {
+  switch (nodeData.type) {
+    case "text":
+      const textNode = $createTextNode(nodeData.text);
+      if (nodeData.format) textNode.setFormat(nodeData.format);
+      if (nodeData.style) textNode.setStyle(nodeData.style);
+      return textNode;
+
+    case "paragraph":
+      const paragraphNode = $createParagraphNode();
+      if (nodeData.children) {
+        nodeData.children.forEach((child) => {
+          const childNode = createLexicalNodesFromData(child);
+          paragraphNode.append(childNode);
+        });
+      }
+      return paragraphNode;
+
+    case "linebreak":
+      return $createLineBreakNode();
+
+    case "list":
+      // Create the list node based on the listType (ordered, unordered, or check)
+      const listNode = $createListNode('bullet' || 'bullet'); // default to 'bullet' if no format provided
+
+      if (nodeData.children) {
+        nodeData.children.forEach((listItemData) => {
+          // Create each list item as a paragraph (can be modified as needed)
+          const listItemNode = $createParagraphNode();
+          listItemData.children.forEach((child) => {
             const childNode = createLexicalNodesFromData(child);
-            paragraphNode.append(childNode);
+            listItemNode.append(childNode);
           });
-        }
-        return paragraphNode;
-  
-      case "linebreak":
-        return $createLineBreakNode();
-  
-      case "list":
-        // Create the list node based on the listType (ordered, unordered, or check)
-        const listNode = $createListNode('bullet' || 'bullet'); // default to 'bullet' if no format provided
-  
-        if (nodeData.children) {
-          nodeData.children.forEach((listItemData) => {
-            // Create each list item as a paragraph (can be modified as needed)
-            const listItemNode = $createParagraphNode();
-            listItemData.children.forEach((child) => {
-              const childNode = createLexicalNodesFromData(child);
-              listItemNode.append(childNode);
-            });
-            listNode.append(listItemNode);
-          });
-        }
-        return listNode;
-  
-      default:
-        throw new Error(`Unsupported node type: ${nodeData.type}`);
-    }
-  };
-  
+          listNode.append(listItemNode);
+        });
+      }
+      return listNode;
+
+    case "link":
+      // Handle the link node
+      const linkNode = $createLinkNode(nodeData.href);
+      if (nodeData.children) {
+        nodeData.children.forEach((child) => {
+          const childNode = createLexicalNodesFromData(child);
+          linkNode.append(childNode);
+        });
+      }
+      return linkNode;
+
+    default:
+      throw new Error(`Unsupported node type: ${nodeData.type}`);
+  }
+};
 
 const convertLexicalDataToHtml = (lexicalData) => {
   try {
