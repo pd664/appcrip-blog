@@ -1,21 +1,23 @@
+// app/post/[slug]/page.js
 import Image from 'next/image';
 import { supabaseService } from '@/app/components/Editor/utils/supabase/supabaseService';
 
 // Enable static page generation with fallback
-export const revalidate = 10;
 export const dynamicParams = true;
 
-// Generate static params during build time
 export async function generateStaticParams() {
-    const posts = await supabaseService.fetchEditorData();
+    const { data: posts } = await supabaseService.supabase
+        .from('editor_data')
+        .select('title') // Only select title for generating slugs
+        .order('created_at', { ascending: true });
 
     return posts?.map((post) => ({
         slug: post.title.toLowerCase().replace(/ /g, '-'),
     })) || [];
 }
 
-// Revalidate every 10 seconds to allow the page to be updated after the build
-
+// ISR: Set revalidate interval to 10 seconds
+export const revalidate = 10;
 
 async function getPostBySlug(slug) {
     const formattedSlug = slug.replace(/ /g, '-');
@@ -34,9 +36,6 @@ export default async function PostPage({ params }) {
         );
     }
 
-    // Convert lexical data to HTML
-    let htmlContent = post.content.content;
-
     return (
         <div>
             <article className="max-w-2xl mx-auto py-8 px-4">
@@ -54,15 +53,11 @@ export default async function PostPage({ params }) {
                         />
                     </div>
                 )}
-                <div
-                    className="prose prose-lg py-5 max-w-none"
-                    dangerouslySetInnerHTML={{ __html: htmlContent }}
-                />
+                <div className="prose prose-lg py-5 max-w-none" dangerouslySetInnerHTML={{ __html: post.content.content }} />
             </article>
         </div>
     );
 }
-
 
 
 // try {
