@@ -45,10 +45,12 @@ export default async function PostPage({ params }) {
                         <Image
                             src={post.image_url}
                             alt={post.title}
+                            fill
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw"
                             priority
                             className="object-cover rounded-lg"
                             loading="eager"
+
                         />
                     </div>
                 )}
