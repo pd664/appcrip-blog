@@ -77,7 +77,6 @@ async getFromCache(slug) {
   return null;
 }
 
-// Optional: Set the post to cache
 async setCache(slug, data) {
   // Store data in in-memory cache
   this.cache[slug] = data;
@@ -101,43 +100,4 @@ async setCache(slug, data) {
 }
 
 export const supabaseService = new SupabaseService();
-
-// async uploadImage(file) {
-//   if (!file) return null; // Check if file is selected
-//   console.log("File is", file);
-
-//   // Sanitize the file name to remove spaces or special characters
-//   const sanitizedFileName = file.name.replace(/\s+/g, '_').replace(/[^\w\-_\.]/g, '');
-
-//   // Generate a unique file path using sanitized name
-//   const filePath = `images/${Date.now()}_${sanitizedFileName}`;
-// console.log("file path", filePath)
-//   // Upload the file
-//   const { data, error } = await this.supabase.storage
-//     .from('images')
-//     .upload(filePath, file, {
-//       cacheControl: '3600',  // You can adjust the cache control as needed
-//       upsert: false,         // Set to 'false' to prevent overwriting
-//     });
-
-//   if (error) {
-//     console.error('Error uploading file:', error);
-//     return null; // Handle the error (you can show an alert or return an error state)
-//   }
-
-//   // Get the public URL of the uploaded file
-//   const { data: imageData, error: imageError } = await this.supabase.storage
-//     .from('images')
-//     .getPublicUrl(filePath); // Use the correct file path
-
-//   if (imageError) {
-//     console.error('Error fetching public URL:', imageError);
-//     return null; // Handle the error
-//   } else {
-//     // Assuming this.imageUrl is your class's state
-//     this.imageUrl = imageData.publicUrl; // Update the class property with the URL
-//     console.log("Uploaded image URL:", this.imageUrl);
-//   }
-// }
-
 

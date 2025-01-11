@@ -4,16 +4,13 @@ import { fetchFirstThreeImages } from "./helpers";
 import Link from "next/link";
 import Image from "next/image";
 
-// For App Router, we use a Server Component
 export default async function HeroSection() {
-  // Add error handling for the data fetching
   try {
     const [posts, imageUrls] = await Promise.all([
       supabaseService.fetchEditorData(),
       fetchFirstThreeImages()
     ]);
 
-    // Ensure posts exists and is an array before mapping
     if (!Array.isArray(posts)) {
       console.error('Posts is not an array:', posts);
       return <div>Error loading posts</div>;
@@ -27,37 +24,6 @@ export default async function HeroSection() {
     }));
 
     return (
-    //   <div className="hero-section">
-    //     <div className="titles-container">
-    //       {formattedTitles.map((item) => (
-    //         <Link 
-    //           href={`/posts/${item.slug}`} 
-    //           key={item.id}
-    //           className="title-link"
-    //         >
-    //           <div className="title-container">
-    //             <h2>{item.title}</h2>
-    //             <span className="year">{item.year}</span>
-    //           </div>
-    //         </Link>
-    //       ))}
-    //     </div>
-
-    //     <div className="images-container">
-    //       {Array.isArray(imageUrls) && imageUrls.map((imageUrl, index) => (
-    //         <div key={index} className="image-wrapper">
-    //           <Image
-    //             src={imageUrl}
-    //             alt={`Hero image ${index + 1}`}
-    //             width={400}
-    //             height={300}
-    //             priority={index === 0}
-    //             className="hero-image"
-    //           />
-    //         </div>
-    //       ))}
-    //     </div>
-    //   </div>
     <div className="max-w-4xl mx-auto py-8 px-4">
             {formattedTitles.map((item) => (
                 <div key={item.id} className="mb-8 group">

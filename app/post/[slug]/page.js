@@ -5,10 +5,10 @@ import { notFound } from 'next/navigation';
 import { unstable_cache } from 'next/cache';
 
 // Set revalidation time (e.g., 60 seconds)
-export const revalidate = 10;
+// export const revalidate = 10;
 
 // Enable dynamic parameters
-export const dynamicParams = true;
+// export const dynamicParams = true;
 
 // Cache the data fetching
 // const getCachedPosts = unstable_cache(
