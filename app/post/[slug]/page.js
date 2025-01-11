@@ -2,7 +2,6 @@ import Image from 'next/image';
 import { supabaseService } from '@/app/components/Editor/utils/supabase/supabaseService';
 
 // Enable static page generation with fallback
-export const revalidate = 10;
 export const dynamicParams = true;
 
 // Generate static params during build time
@@ -15,7 +14,7 @@ export async function generateStaticParams() {
 }
 
 // Revalidate every 10 seconds to allow the page to be updated after the build
-
+export const revalidate = 10;
 
 async function getPostBySlug(slug) {
     const formattedSlug = slug.replace(/ /g, '-');
@@ -46,7 +45,6 @@ export default async function PostPage({ params }) {
                         <Image
                             src={post.image_url}
                             alt={post.title}
-                            fill
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw"
                             priority
                             className="object-cover rounded-lg"
@@ -62,22 +60,3 @@ export default async function PostPage({ params }) {
         </div>
     );
 }
-
-
-
-// try {
-    //     console.log("converting", post)
-    //     const lexicalData = dbToLexicalData(post.content);
-    //     console.log("lexical", lexicalData)
-    //     htmlContent = convertLexicalDataToHtml(lexicalData);
-    //     console.log("html ", htmlContent)
-    // } catch (error) {
-    //     console.error('Error processing post data:', error);
-    //     // Return a more graceful error UI
-    //     return (
-    //         <div className="max-w-2xl mx-auto py-8 px-4">
-    //             <h1 className="text-3xl font-bold mb-6">{post.title}</h1>
-    //             <p>There was an error processing this post's content.</p>
-    //         </div>
-    //     );
-    // }

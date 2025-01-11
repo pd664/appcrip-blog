@@ -1,3 +1,5 @@
+
+import "./globals.css";
 import { handleWebVitals } from "./reportWebVitals";
 
 export const metadata = {
