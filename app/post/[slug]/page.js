@@ -15,7 +15,7 @@ export async function generateStaticParams() {
 }
 
 
-export const revalidate = 0;
+export const revalidate = 10;
 
 async function getPostBySlug(slug) {
     console.log("slug is ", slug)
