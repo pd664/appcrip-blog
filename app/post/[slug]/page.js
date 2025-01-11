@@ -1,65 +1,82 @@
-'use client'
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { useSupabase } from '@/app/components/Editor/hooks/useSupabase';
-import { dbToLexicalData, convertLexicalDataToHtml } from '@/app/components/Home/lexical-html';
+// app/post/[slug]/page.js
 import Image from 'next/image';
-// import Header from '@/components/Header';
+import { dbToLexicalData, convertLexicalDataToHtml } from '@/app/components/Home/lexical-html';
+import { supabaseService } from '@/app/components/Editor/utils/supabase/supabaseService';
 
-export default function PostPage() {
-    const params = useParams();
-    const { editorData, loading, error } = useSupabase();
-    const [post, setPost] = useState(null);
-    const [htmlContent, setHtmlContent] = useState('');
-// console.log("posts are", post)
-    useEffect(() => {
-        if (editorData && params.slug) {
-            const currentPost = editorData.find(post => 
-                post.title.toLowerCase().replace(/ /g, '-') === params.slug
-            );
+// Enable static page generation with fallback
+export const dynamicParams = true
 
-            if (currentPost) {
-                setPost(currentPost);
-                try {
-                    const lexicalData = dbToLexicalData(currentPost.content);
-                    const html = convertLexicalDataToHtml(lexicalData);
-                    setHtmlContent(html);
-                } catch (error) {
-                    console.error('Error processing post data:', error);
-                }
-            }
-        }
-    }, [editorData, params.slug]);
+export async function generateStaticParams() {
+    const posts  = await supabaseService.fetchEditorData()
 
-    // if (loading) {
-    //     return <div className="max-w-2xl mx-auto py-8 px-4">Loading...</div>;
+    return posts?.map((post) => ({
+        slug: post.title.toLowerCase().replace(/ /g, '-'),
+    })) || [];
+}
+
+
+export const revalidate = 0;
+
+async function getPostBySlug(slug) {
+    console.log("slug is ", slug)
+    // Use the optimized fetchPostBySlug method
+    const formattedSlug = slug.replace(/ /g, '-');
+    const post = await supabaseService.fetchPostBySlug(formattedSlug);
+    return post;
+}
+
+export default async function PostPage({ params }) {
+    const post = await getPostBySlug(params.slug);
+
+    if (!post) {
+        return (
+            <div className="max-w-2xl mx-auto py-8 px-4">
+                Post not found
+            </div>
+        );
+    }
+
+    // Convert lexical data to HTML
+    let htmlContent = post.content.content
+    // try {
+    //     console.log("converting", post)
+    //     const lexicalData = dbToLexicalData(post.content);
+    //     console.log("lexical", lexicalData)
+    //     htmlContent = convertLexicalDataToHtml(lexicalData);
+    //     console.log("html ", htmlContent)
+    // } catch (error) {
+    //     console.error('Error processing post data:', error);
+    //     // Return a more graceful error UI
+    //     return (
+    //         <div className="max-w-2xl mx-auto py-8 px-4">
+    //             <h1 className="text-3xl font-bold mb-6">{post.title}</h1>
+    //             <p>There was an error processing this post's content.</p>
+    //         </div>
+    //     );
     // }
 
-    // if (error) {
-    //     return <div className="max-w-2xl mx-auto py-8 px-4">Error loading post</div>;
-    // }
-
-    // if (!post) {
-    //     return <div className="max-w-2xl mx-auto py-8 px-4">Post not found</div>;
-    // }
-
-    if(post) {
-       return (
+    return (
         <div>
             <article className="max-w-2xl mx-auto py-8 px-4">
-
                 <h1 className="text-3xl font-bold mb-6">{post.title}</h1>
-                {post.image_url && <Image
-                    src={post.image_url}
-                    alt={post.title}
-                    width={1000} 
-                    height={500}  
-                    layout="responsive"  
-                    />}
-                <div className="prose prose-lg py-5" dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                {post.image_url && (
+                    <div className="relative aspect-video mb-6">
+                        <Image
+                            src={post.image_url}
+                            alt={post.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw"
+                            priority
+                            className="object-cover rounded-lg"
+                            loading="eager"
+                        />
+                    </div>
+                )}
+                <div 
+                    className="prose prose-lg py-5 max-w-none"
+                    dangerouslySetInnerHTML={{ __html: htmlContent }}
+                />
             </article>
         </div>
-    ); 
-    }
-    
+    );
 }

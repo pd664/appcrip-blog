@@ -23,7 +23,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { ListNode, ListItemNode } from '@lexical/list';
 import { LinkNode } from '@lexical/link';
 // import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-
+import { dbToLexicalData, convertLexicalDataToHtml } from '@/app/components/Home/lexical-html';
 const editorConfig = {
   namespace: 'MyEditor',
   theme: {
@@ -87,10 +87,12 @@ console.log("editor", editorState)
       if (!editorState) {
         throw new Error('No content to save');
       }
-
+      const lexicalData = dbToLexicalData(editorState);
+      console.log("lexical", lexicalData)
+      let htmlContent = convertLexicalDataToHtml(lexicalData);
       // Create a save payload with metadata
       const savePayload = {
-        content: editorState,
+        content: htmlContent,
         metadata: {
           lastModified: new Date().toISOString(),
           version: '1.0',

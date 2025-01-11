@@ -1,10 +1,7 @@
-"use client";
 
-import { useEffect } from "react";
 import { createEditor } from "lexical";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { $createTextNode, $createParagraphNode, $getRoot, $createLineBreakNode, $createListNode } from "lexical";
-import { useSupabase } from "../Editor/hooks/useSupabase";
 
 // Function to recursively create Lexical nodes from lexicalData
 const createLexicalNodesFromData = (nodeData) => {
@@ -126,7 +123,7 @@ function parseContentToHTMLJSON(data) {
 function dbToLexicalData(dbData) {
     console.log("lexical", dbData.content)
   try {
-    return JSON.parse(dbData.content);
+    return JSON.parse(dbData);
   } catch (error) {
     console.error("Error transforming database data:", error);
     throw new Error(`Failed to transform database data: ${error.message}`);

@@ -21,18 +21,7 @@ export function useSupabase() {
       }
     };
 
-    // // Set up auth listener
-    // const { data: { subscription } } = supabaseService.onAuthStateChange((event) => {
-    //   if (event === 'SIGNED_OUT') {
-    //     router.push('/auth/login');
-    //   }
-    // });
-
     fetchInitialData();
-
-    // return () => {
-    //   subscription.unsubscribe();
-    // };
   }, []);
 
 const saveContent = async (content, file, title) => {
