@@ -8,14 +8,26 @@ export const dynamicParams = true;
 export async function generateStaticParams() {
     const posts = await supabaseService.fetchEditorData();
 
-    return posts?.map((post) => ({
-        slug: post.title.toLowerCase().replace(/ /g, '-'),
+    // Fetch all data for each post
+    const postsWithData = await Promise.all(
+        posts.map(async (post) => {
+            const fullPostData = await supabaseService.fetchPostBySlug(post.title.toLowerCase().replace(/ /g, '-'));
+            return {
+                slug: post.title.toLowerCase().replace(/ /g, '-'),
+                post: fullPostData, // Fetch the full post data here
+            };
+        })
+    );
+
+    return postsWithData.map(({ slug }) => ({
+        slug,
     })) || [];
 }
 
 // Revalidate every 10 seconds to allow the page to be updated after the build
 export const revalidate = 10;
 
+// Function to fetch post by slug
 async function getPostBySlug(slug) {
     const formattedSlug = slug.replace(/ /g, '-');
     const post = await supabaseService.fetchPostBySlug(formattedSlug);
@@ -23,6 +35,7 @@ async function getPostBySlug(slug) {
 }
 
 export default async function PostPage({ params }) {
+    // Fetch the post data using the slug from the URL
     const post = await getPostBySlug(params.slug);
 
     if (!post) {
@@ -33,7 +46,7 @@ export default async function PostPage({ params }) {
         );
     }
 
-    // Convert lexical data to HTML
+    // Extract the content of the post
     let htmlContent = post.content.content;
 
     return (
@@ -50,7 +63,6 @@ export default async function PostPage({ params }) {
                             priority
                             className="object-cover rounded-lg"
                             loading="eager"
-
                         />
                     </div>
                 )}
