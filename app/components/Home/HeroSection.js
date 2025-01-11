@@ -1,4 +1,4 @@
-// app/components/HeroSection.tsx
+'use client'
 import { supabaseService } from "../Editor/utils/supabase/supabaseService";
 import { fetchFirstThreeImages } from "./helpers";
 import Link from "next/link";

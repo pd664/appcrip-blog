@@ -1,4 +1,4 @@
-// app/[slug]/page.js
+'use client'
 import Image from 'next/image';
 import { supabaseService } from '@/app/components/Editor/utils/supabase/supabaseService';
 import { notFound } from 'next/navigation';
