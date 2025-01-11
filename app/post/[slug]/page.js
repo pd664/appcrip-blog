@@ -1,45 +1,45 @@
 import Image from 'next/image';
 import { supabaseService } from '@/app/components/Editor/utils/supabase/supabaseService';
-import { fetchFirstThreeImages } from '@/app/components/Home/helpers';
-// Enable static page generation with fallback
+
+// Enable dynamic params for new posts
 export const dynamicParams = true;
 
 // Generate static params during build time
 export async function generateStaticParams() {
     const posts = await supabaseService.fetchEditorData();
-    const imageUrls = await fetchFirstThreeImages(); // Move this to server side
-
-    // Fetch all data for each post
-    const postsWithData = await Promise.all(
-        posts.map(async (post) => {
-            const fullPostData = await supabaseService.fetchPostBySlug(post.title.toLowerCase().replace(/ /g, '-'));
-            return {
-                slug: post.title.toLowerCase().replace(/ /g, '-'),
-                post: fullPostData, // Fetch the full post data here
-            };
-        })
-    );
-
-    return postsWithData.map(({ slug }) => ({
-        slug,
-        imageUrls: imageUrls
+    
+    return posts?.map((post) => ({
+        slug: post.title.toLowerCase().replace(/ /g, '-'),
     })) || [];
 }
 
-// Revalidate every 10 seconds to allow the page to be updated after the build
-export const revalidate = 10;
+// Force dynamic rendering for new posts
+export const dynamic = 'force-dynamic';
 
-// Function to fetch post by slug
+// Remove the revalidate constant since we're using force-dynamic
+// export const revalidate = 10;
+
 async function getPostBySlug(slug) {
     const formattedSlug = slug.replace(/ /g, '-');
-    const post = await supabaseService.fetchPostBySlug(formattedSlug);
+    // Directly fetch from Supabase to get latest data
+    const { data: post, error } = await supabaseService.supabase
+        .from('editor_data')
+        .select('*')
+        .eq('title', formattedSlug.replace(/-/g, ' '))
+        .single();
+
+    if (error) {
+        console.error('Error fetching post:', error);
+        return null;
+    }
+
     return post;
 }
 
 export default async function PostPage({ params }) {
-    // Fetch the post data using the slug from the URL
-    const post = await getPostBySlug(params.slug);
-
+    const sl = await params.slug;
+    const post = await getPostBySlug(sl);
+console.log("opening....")
     if (!post) {
         return (
             <div className="max-w-2xl mx-auto py-8 px-4">
@@ -48,7 +48,6 @@ export default async function PostPage({ params }) {
         );
     }
 
-    // Extract the content of the post
     let htmlContent = post.content.content;
 
     return (
