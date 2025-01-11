@@ -11,25 +11,25 @@ export const revalidate = 10;
 export const dynamicParams = true;
 
 // Cache the data fetching
-const getCachedPosts = unstable_cache(
-    async () => {
-        const posts = await supabaseService.fetchEditorData();
-        return posts;
-    },
-    ['posts-cache'], // cache key
-    {
-        revalidate: 60, // revalidate every 60 seconds
-        tags: ['posts'] // tag for manual revalidation
-    }
-);
+// const getCachedPosts = unstable_cache(
+//     async () => {
+//         const posts = await supabaseService.fetchEditorData();
+//         return posts;
+//     },
+//     ['posts-cache'], // cache key
+//     {
+//         revalidate: 60, // revalidate every 60 seconds
+//         tags: ['posts'] // tag for manual revalidation
+//     }
+// );
 
-export async function generateStaticParams() {
-    const posts = await getCachedPosts();
+// export async function generateStaticParams() {
+//     const posts = await getCachedPosts();
     
-    return posts?.map((post) => ({
-        slug: post.title.toLowerCase().replace(/ /g, '-'),
-    })) || [];
-}
+//     return posts?.map((post) => ({
+//         slug: post.title.toLowerCase().replace(/ /g, '-'),
+//     })) || [];
+// }
 
 async function getPostData(slug) {
     const posts = await getCachedPosts();
