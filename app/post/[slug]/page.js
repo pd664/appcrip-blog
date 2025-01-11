@@ -1,4 +1,3 @@
-// app/post/[slug]/page.jsx
 'use client'
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -12,7 +11,7 @@ export default function PostPage() {
     const { editorData, loading, error } = useSupabase();
     const [post, setPost] = useState(null);
     const [htmlContent, setHtmlContent] = useState('');
-console.log("posts are", post)
+// console.log("posts are", post)
     useEffect(() => {
         if (editorData && params.slug) {
             const currentPost = editorData.find(post => 
@@ -32,19 +31,20 @@ console.log("posts are", post)
         }
     }, [editorData, params.slug]);
 
-    if (loading) {
-        return <div className="max-w-2xl mx-auto py-8 px-4">Loading...</div>;
-    }
+    // if (loading) {
+    //     return <div className="max-w-2xl mx-auto py-8 px-4">Loading...</div>;
+    // }
 
-    if (error) {
-        return <div className="max-w-2xl mx-auto py-8 px-4">Error loading post</div>;
-    }
+    // if (error) {
+    //     return <div className="max-w-2xl mx-auto py-8 px-4">Error loading post</div>;
+    // }
 
-    if (!post) {
-        return <div className="max-w-2xl mx-auto py-8 px-4">Post not found</div>;
-    }
+    // if (!post) {
+    //     return <div className="max-w-2xl mx-auto py-8 px-4">Post not found</div>;
+    // }
 
-    return (
+    if(post) {
+       return (
         <div>
             <article className="max-w-2xl mx-auto py-8 px-4">
 
@@ -52,12 +52,14 @@ console.log("posts are", post)
                 {post.image_url && <Image
                     src={post.image_url}
                     alt={post.title}
-                    width={1000}  // Set a large width for aspect ratio
-                    height={500}  // Set a corresponding height for aspect ratio
-                    layout="responsive"  // This makes the image responsive
+                    width={1000} 
+                    height={500}  
+                    layout="responsive"  
                     />}
-                <div className="prose prose-lg" dangerouslySetInnerHTML={{ __html: htmlContent }} />
+                <div className="prose prose-lg py-5" dangerouslySetInnerHTML={{ __html: htmlContent }} />
             </article>
         </div>
-    );
+    ); 
+    }
+    
 }

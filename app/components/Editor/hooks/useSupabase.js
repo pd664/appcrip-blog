@@ -21,21 +21,21 @@ export function useSupabase() {
       }
     };
 
-    // Set up auth listener
-    const { data: { subscription } } = supabaseService.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') {
-        router.push('/auth/login');
-      }
-    });
+    // // Set up auth listener
+    // const { data: { subscription } } = supabaseService.onAuthStateChange((event) => {
+    //   if (event === 'SIGNED_OUT') {
+    //     router.push('/auth/login');
+    //   }
+    // });
 
     fetchInitialData();
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [router]);
+    // return () => {
+    //   subscription.unsubscribe();
+    // };
+  }, []);
 
-  const saveContent = async (content, file, title) => {
+const saveContent = async (content, file, title) => {
   setLoading(true);
   try {
     let imageUrl = '';
@@ -70,68 +70,6 @@ console.log("imageurl", imageUrl)
     setLoading(false);
   }
 };
-
-const fetchImages = async() => {
-  try {
-    console.log("Uploading file to S3", file);
-
-    const response = await axios.get(
-      `https://prateek-test-interview.s3.ap-south-1.amazonaws.com/${file.name}`,
-      file,
-      {
-        headers: {
-          "Content-Type": file.type,
-        },
-      }
-    );
-
-    // If the upload is successful, log the response and return the file's URL
-    console.log("File uploaded successfully:", response, response?.request?.responseURL);
-    return response?.request?.responseURL;  // The URL of the uploaded file in S3
-
-  } catch (err) {
-    console.error("Error uploading file:", err);
-    return null; // Return null if there is an error
-  }
-};
-
-const fetchFirstThreeImages = async () => {
-  const bucketName = "prateek-test-interview";
-  const region = "ap-south-1";
-  const folder = "images";
-
-  try {
-    const response = await fetch(
-      `https://prateek-test-interview.s3.ap-south-1.amazonaws.com?prefix=images/`
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch bucket contents: ${response.statusText}`);
-    }
-
-    const textResponse = await response.text();
-
-    // Parse the XML response
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(textResponse, "text/xml");
-    const keys = xmlDoc.getElementsByTagName("Key");
-
-    // Extract the first three image URLs
-    const imageUrls = [];
-    for (let i = 0; i < Math.min(3, keys.length); i++) {
-      const key = keys[i].textContent;
-      imageUrls.push(`https://${bucketName}.s3.${region}.amazonaws.com/${key}`);
-    }
-
-    console.log("First three images:", imageUrls);
-    return imageUrls;
-  } catch (err) {
-    console.error("Error fetching images from S3:", err);
-    return [];
-  }
-};
-
-
 
 const uploadFile = async (file) => {
   try {

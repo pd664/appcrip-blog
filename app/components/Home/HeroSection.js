@@ -23,12 +23,10 @@ const fetchFirstThreeImages = async () => {
 
         const textResponse = await response.text();
 
-        // Parse the XML response
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(textResponse, "text/xml");
         const keys = xmlDoc.getElementsByTagName("Key");
 
-        // Extract the first three image URLs
         const imageUrls = [];
         for (let i = 0; i < Math.min(3, keys.length); i++) {
             const key = keys[i].textContent;
