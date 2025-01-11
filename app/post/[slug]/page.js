@@ -2,109 +2,87 @@
 import Image from 'next/image';
 import { supabaseService } from '@/app/components/Editor/utils/supabase/supabaseService';
 import { notFound } from 'next/navigation';
+import { unstable_cache } from 'next/cache';
 
-// Remove force-dynamic since we want to use ISR
-// export const dynamic = 'force-dynamic';
+// Set revalidation time (e.g., 60 seconds)
+export const revalidate = 10;
 
 // Enable dynamic parameters
 export const dynamicParams = true;
 
-// Add revalidation time (e.g., every 60 seconds)
-export const revalidate = 10;
-
-// This generates the static paths at build time AND serves as our data source
-export async function generateStaticParams() {
-    try {
+// Cache the data fetching
+const getCachedPosts = unstable_cache(
+    async () => {
         const posts = await supabaseService.fetchEditorData();
-        // Store the full post data in a global cache or external cache
-        globalThis.postsCache = posts?.reduce((acc, post) => {
-            acc[post.title.toLowerCase().replace(/ /g, '-')] = post;
-            return acc;
-        }, {});
-
-        return posts?.map((post) => ({
-            slug: post.title.toLowerCase().replace(/ /g, '-'),
-        })) || [];
-    } catch (error) {
-        console.error('Error generating static params:', error);
-        return [];
+        return posts;
+    },
+    ['posts-cache'], // cache key
+    {
+        revalidate: 60, // revalidate every 60 seconds
+        tags: ['posts'] // tag for manual revalidation
     }
+);
+
+export async function generateStaticParams() {
+    const posts = await getCachedPosts();
+    
+    return posts?.map((post) => ({
+        slug: post.title.toLowerCase().replace(/ /g, '-'),
+    })) || [];
 }
 
-// Modified to use cached data when available
 async function getPostData(slug) {
-    try {
-        // First, try to get from cache if it exists
-        if (globalThis.postsCache?.[slug]) {
-            return globalThis.postsCache[slug];
-        }
+    const posts = await getCachedPosts();
+    
+    // Find the post in our cached data
+    const post = posts?.find(
+        post => post.title.toLowerCase().replace(/ /g, '-') === slug
+    );
+    
+    if (post) return post;
 
-        // If not in cache, fetch from Supabase
-        const titleFromSlug = slug.replace(/-/g, ' ');
-        const { data: post, error } = await supabaseService.supabase
-            .from('editor_data')
-            .select('*')
-            .ilike('title', titleFromSlug)
-            .single();
-
-        if (error) {
-            console.error('Error fetching post:', error);
-            return null;
-        }
-
-        // Update cache with new data
-        if (!globalThis.postsCache) globalThis.postsCache = {};
-        globalThis.postsCache[slug] = post;
-
-        return post;
-    } catch (error) {
-        console.error('Error in getPostData:', error);
-        return null;
-    }
+    // Fallback to direct database query if not found in cache
+    const { data } = await supabaseService.supabase
+        .from('editor_data')
+        .select('*')
+        .ilike('title', slug.replace(/-/g, ' '))
+        .single();
+        
+    return data;
 }
 
 export default async function PostPage({ params }) {
-    try {
-        const post = await getPostData(params.slug);
-
-        if (!post) {
-            notFound();
-        }
-
-        const htmlContent = post.content?.content || '';
-
-        return (
-            <div>
-                <article className="max-w-2xl mx-auto py-8 px-4">
-                    <h1 className="text-3xl font-bold mb-6">{post.title}</h1>
-                    
-                    {post.image_url && (
-                        <div className="relative aspect-video mb-6">
-                            <Image
-                                src={post.image_url}
-                                alt={post.title}
-                                fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw"
-                                priority
-                                className="object-cover rounded-lg"
-                                loading="eager"
-                            />
-                        </div>
-                    )}
-                    
-                    <div
-                        className="prose prose-lg py-5 max-w-none"
-                        dangerouslySetInnerHTML={{ __html: htmlContent }}
-                    />
-                </article>
-            </div>
-        );
-    } catch (error) {
-        console.error('Error rendering post page:', error);
-        return (
-            <div className="max-w-2xl mx-auto py-8 px-4">
-                Error loading post
-            </div>
-        );
+    const post = await getPostData(params.slug);
+    
+    if (!post) {
+        notFound();
     }
+
+    const htmlContent = post.content?.content || '';
+
+    return (
+        <div>
+            <article className="max-w-2xl mx-auto py-8 px-4">
+                <h1 className="text-3xl font-bold mb-6">{post.title}</h1>
+                
+                {post.image_url && (
+                    <div className="relative aspect-video mb-6">
+                        <Image
+                            src={post.image_url}
+                            alt={post.title}
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw"
+                            priority
+                            className="object-cover rounded-lg"
+                        />
+                    </div>
+                )}
+                
+                <div
+                    className="prose prose-lg py-5 max-w-none"
+                    dangerouslySetInnerHTML={{ __html: htmlContent }}
+                />
+            </article>
+        </div>
+    );
 }
