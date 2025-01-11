@@ -32,17 +32,19 @@ class SupabaseService {
   // }
 
   async fetchEditorData() {
-    // Only fetch needed fields for listing
     const { data, error } = await this.supabase
-      .from('editor_data')
-      .select('id, title, created_at')
-      .order('created_at', { ascending: true });
-  
-    if (error) throw error;
-    return data;
-  }
+        .from('editor_data')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-  
+    if (error) {
+        console.error('Error fetching editor data:', error);
+        throw error;
+    }
+
+    return data;
+}
+ 
   async fetchPostBySlug(slug) {
     const cachedPost = await this.getFromCache(slug);
     if (cachedPost) return cachedPost;

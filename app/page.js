@@ -14,7 +14,6 @@ export default function Home() {
       "name": "Prateek"
     },
     "datePublished": "2025-01-10", // Set current date or the date when the post is published
-    "image": "https://your-website.com/images/blog-thumbnail.jpg", // Update with the actual image URL
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https://your-website.com/blog"
