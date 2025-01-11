@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { supabaseService } from '@/app/components/Editor/utils/supabase/supabaseService';
 
 // Enable static page generation with fallback
+export const revalidate = 10;
 export const dynamicParams = true;
 
 // Generate static params during build time
@@ -14,7 +15,7 @@ export async function generateStaticParams() {
 }
 
 // Revalidate every 10 seconds to allow the page to be updated after the build
-export const revalidate = 10;
+
 
 async function getPostBySlug(slug) {
     const formattedSlug = slug.replace(/ /g, '-');
