@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import { supabaseService } from '@/app/components/Editor/utils/supabase/supabaseService';
-
+import { fetchFirstThreeImages } from '@/app/components/Home/helpers';
 // Enable static page generation with fallback
 export const dynamicParams = true;
 
 // Generate static params during build time
 export async function generateStaticParams() {
     const posts = await supabaseService.fetchEditorData();
+    const imageUrls = await fetchFirstThreeImages(); // Move this to server side
 
     // Fetch all data for each post
     const postsWithData = await Promise.all(
@@ -21,6 +22,7 @@ export async function generateStaticParams() {
 
     return postsWithData.map(({ slug }) => ({
         slug,
+        imageUrls: imageUrls
     })) || [];
 }
 

@@ -3,6 +3,7 @@ import { fetchFirstThreeImages } from "./helpers";
 import Link from "next/link";
 import Image from "next/image";
 
+
 export default async function HeroSection() {
     // Remove useState and useEffect
     const posts = await supabaseService.fetchEditorData();
